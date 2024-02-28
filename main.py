@@ -1,94 +1,159 @@
-import pygame
 import sys
 from PySide6 import QtCore, QtWidgets as QtW, QtGui
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
-import math
+import calculations
 
-pygame.init()
+gravitational_constance = 6.674e-11
 
 
 class configWindow(QtW.QWidget):
-    def __init__(self, x: int, y: int):
+    def __init__(self):
         super().__init__()
-        self.gravitationalConstance = 6.673 * 10**-11
 
-        self.gravitational_force_label = QtW.QLabel()
+        self.input_Mass_Label = QtW.QLabel("Mass of your object:")
+        self.input_Mass = QtW.QLineEdit()
+        self.input_Mass.setPlaceholderText("Input mass in kg")
 
-        self.MassLabel = QtW.QLabel()
-        self.MassLabel.setText("Mass in kg")
+        self.input_Radius_Label = QtW.QLabel("Radius of your object:")
+        self.input_Radius = QtW.QLineEdit()
+        self.input_Radius.setPlaceholderText("Input radius in km")
 
-        self.MassInput = QtW.QLineEdit()
-        self.MassInput.setPlaceholderText("Input planet mass")
-        self.Mass = 0
+        self.input_Velocity_Label = QtW.QLabel("Velocity of your object:")
+        self.input_Velocity = QtW.QLineEdit()
+        self.input_Velocity.setPlaceholderText("Input velocity")
 
-        self.RadiusLabel = QtW.QLabel()
-        self.RadiusLabel.setText("Radius in km")
+        self.input_x_coordinate_Label = QtW.QLabel("X-coordinate of your object:")
+        self.input_x_coordinate = QtW.QLineEdit()
+        self.input_x_coordinate.setPlaceholderText("Input x coordinate")
 
-        self.RadiusInput = QtW.QLineEdit()
-        self.RadiusInput.setPlaceholderText("Input planet radius")
-        self.Radius = 0
+        self.input_y_coordinate_Label = QtW.QLabel("Y-coordinate of your object:")
+        self.input_y_coordinate = QtW.QLineEdit()
+        self.input_y_coordinate.setPlaceholderText("Input y coordinate")
 
-        self.Center = x, y
+        self.settings_Window_Button = QtW.QPushButton("Change default settings")
+        self.settings_Window_Button.clicked.connect(self.open_Settings_Window)
 
-        self.createButton = QtW.QPushButton("Create model")
-        self.createButton.clicked.connect(self.calculate_gravitational_force)
+        self.save_Obj_config = QtW.QPushButton("Save current configuration")
+        self.save_Obj_config.clicked.connect(self.create_Object)
 
-        self.layout = QtW.QVBoxLayout(self)
-        self.layout.addWidget(self.MassLabel)
-        self.layout.addWidget(self.MassInput)
-        self.layout.addWidget(self.RadiusLabel)
-        self.layout.addWidget(self.RadiusInput)
-        self.layout.addWidget(self.createButton)
-        self.layout.addWidget(self.gravitational_force_label)
-
-    def calculate_gravitational_force(self):
-        self.Mass = self.MassInput.text()
-        self.Radius = self.RadiusInput.text()
-        self.gravitational_force = self.gravitationalConstance * (
-            (float(self.Mass)) / (float(self.Radius) ** 2)
+        self.main_layout = QtW.QVBoxLayout(self)
+        self.main_layout.addWidget(
+            self.settings_Window_Button, alignment=QtCore.Qt.AlignmentFlag.AlignTop
         )
-        self.gravitational_force_label.setText(str(self.gravitational_force))
+        self.main_layout.addWidget(
+            self.input_Mass_Label, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_Mass, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_Radius_Label, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_Radius, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_Velocity_Label, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_Velocity, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_x_coordinate_Label, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_x_coordinate, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_y_coordinate_Label, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.input_y_coordinate, alignment=QtCore.Qt.AlignmentFlag.AlignTop
+        )
+        self.main_layout.addWidget(
+            self.save_Obj_config, alignment=QtCore.Qt.AlignmentFlag.AlignBottom
+        )
+
+    def open_Settings_Window(self):
+        global gravitational_constance
+        changeDefaultSettings.show(settingsWindow_widget)
+
+    def create_Object(self):
+        self.mass = float(str(self.input_Mass.text()))
+        self.radius = float(str(self.input_Radius.text()))
+        self.velocity = float(str(self.input_Velocity.text()))
+        self.x_coordinate = float(str(self.input_x_coordinate.text()))
+        self.y_coordinate = float(str(self.input_y_coordinate.text()))
+
+
+class initObject(QtW.QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.create_Object_button = QtW.QPushButton("Create a new Object")
+        self.create_Object_button.clicked.connect(self.create_new_Object)
+
+        self.main_layout = QtW.QVBoxLayout(self)
+        self.row_layout = QtW.QHBoxLayout()
+        self.column_layout = QtW.QVBoxLayout()
+
+        self.main_layout.addLayout(self.row_layout)
+        self.row_layout.addLayout(self.column_layout)
+        self.main_layout.addWidget(
+            self.create_Object_button, alignment=QtCore.Qt.AlignmentFlag.AlignBottom
+        )
+
+    def create_new_Object(self):
+        configWindow.show(configWindow_widget)
+
+
+class changeDefaultSettings(QtW.QWidget):
+    global gravitational_constance
+
+    def __init__(self):
+        super().__init__()
+
+        # self.gravViewLabel = QtW.QLabel(
+        #     "Gravitational constance: " + str(gravitational_constance)
+        # )
+
+        self.InputNewGravConst = QtW.QLineEdit()
+        self.InputNewGravConst.setPlaceholderText(
+            "Current gravitational constance: " + str(gravitational_constance)
+        )
+
+        self.editGravConstButton = QtW.QPushButton("Change")
+        self.editGravConstButton.clicked.connect(self.changeGravitationalConstance)
+
+        ##//Layouts\\##
+        self.main_layout = QtW.QVBoxLayout(self)
+        self.columnlayout = QtW.QHBoxLayout()
+
+        self.main_layout.addLayout(self.columnlayout)
+        self.columnlayout.addWidget(self.InputNewGravConst)
+        self.columnlayout.addWidget(self.InputNewGravConst)
+        self.columnlayout.addWidget(self.editGravConstButton)
+
+    def changeGravitationalConstance(self, new_gravitational_constance: float):
+        global gravitational_constance
+        new_gravitational_constance = float(self.InputNewGravConst.text())
+        gravitational_constance = new_gravitational_constance
+        print(f"Changed gravitational constance to: {gravitational_constance}")
 
 
 if __name__ == "__main__":
     app = QtW.QApplication([])
 
-    widget = configWindow(x=400, y=300)
-    widget.resize(800, 600)
-    widget.show()
+    initObject_widget = initObject()
+    initObject_widget.resize(800, 600)
+    initObject_widget.setWindowTitle("initObject")
+    initObject_widget.show()
 
+    configWindow_widget = configWindow()
+    configWindow_widget.resize(400, 500)
+    configWindow_widget.setWindowTitle("configWindow")
+
+    settingsWindow_widget = changeDefaultSettings()
+    settingsWindow_widget.resize(400, 250)
+    settingsWindow_widget.setWindowTitle("settingsWindow")
     sys.exit(app.exec())
-
-
-class planet:
-    def __init__(self):
-        self.Mass: float = 0
-        self.Radius: float = 0
-        self.isInSolarSystem: bool = False
-
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-player = pygame.Rect((300, 250, 50, 50))
-
-run = True
-while run:
-
-    screen.fill((0, 0, 0))
-
-    pygame.draw.rect(screen, (255, 0, 0), player)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-
-        if event.type == pygame.MOUSEMOTION:
-            key = pygame.mouse.get_pos()
-            player.center = key
-
-    pygame.display.update()
-
-pygame.quit()
