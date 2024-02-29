@@ -2,8 +2,31 @@ import sys
 from PySide6 import QtCore, QtWidgets as QtW, QtGui
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 import calculations
+import pygame
+
+WIDTH, HEIGHT = 800, 600
+
+pygame.init()
+
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 gravitational_constance = 6.674e-11
+
+Space_Object_List = []
+
+
+class SpaceObject:
+    def __init__(self, mass, radius, velocity, x_coordinate, y_coordinate) -> None:
+        self.mass = mass
+        self.radius = radius
+        self.velocity = velocity
+        self.x_coordinate = x_coordinate
+        self.y_coordinate = y_coordinate
+        pygame.draw.circle(
+            screen, (255, 255, 255), (self.x_coordinate, self.y_coordinate), self.radius
+        )
+        pygame.display.flip()
 
 
 class configWindow(QtW.QWidget):
@@ -79,11 +102,14 @@ class configWindow(QtW.QWidget):
         changeDefaultSettings.show(settingsWindow_widget)
 
     def create_Object(self):
-        self.mass = float(str(self.input_Mass.text()))
-        self.radius = float(str(self.input_Radius.text()))
-        self.velocity = float(str(self.input_Velocity.text()))
-        self.x_coordinate = float(str(self.input_x_coordinate.text()))
-        self.y_coordinate = float(str(self.input_y_coordinate.text()))
+        mass = float(str(self.input_Mass.text()))
+        radius = float(str(self.input_Radius.text()))
+        velocity = float(str(self.input_Velocity.text()))
+        x_coordinate = float(str(self.input_x_coordinate.text()))
+        y_coordinate = float(str(self.input_y_coordinate.text()))
+
+        Space_Object = SpaceObject(mass, radius, velocity, x_coordinate, y_coordinate)
+        return Space_Object
 
 
 class initObject(QtW.QWidget):
@@ -156,4 +182,11 @@ if __name__ == "__main__":
     settingsWindow_widget = changeDefaultSettings()
     settingsWindow_widget.resize(400, 250)
     settingsWindow_widget.setWindowTitle("settingsWindow")
-    sys.exit(app.exec())
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+    # sys.exit(app.exec())
