@@ -7,8 +7,6 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 
 pygame.init()
-
-pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 gravitational_constance = 6.674e-11
@@ -102,6 +100,7 @@ class configWindow(QtW.QWidget):
         changeDefaultSettings.show(settingsWindow_widget)
 
     def create_Object(self):
+        global Space_Object_List
         mass = float(str(self.input_Mass.text()))
         radius = float(str(self.input_Radius.text()))
         velocity = float(str(self.input_Velocity.text()))
@@ -109,6 +108,10 @@ class configWindow(QtW.QWidget):
         y_coordinate = float(str(self.input_y_coordinate.text()))
 
         Space_Object = SpaceObject(mass, radius, velocity, x_coordinate, y_coordinate)
+        Space_Object_List.append(Space_Object)
+        print(
+            f"Current Space Object List: {Space_Object_List} {mass, radius, velocity, x_coordinate, y_coordinate}"
+        )
         return Space_Object
 
 
@@ -188,5 +191,3 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-    # sys.exit(app.exec())
